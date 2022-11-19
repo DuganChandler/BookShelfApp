@@ -1,0 +1,14 @@
+body {
+    background-color: lightblue; 
+    font: 16px Arial;
+}
+
+ol {
+    font-size: 24;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+ol .favorite {
+    color: green;
+}

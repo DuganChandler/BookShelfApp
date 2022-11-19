@@ -1,0 +1,103 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/static/style.css" rel="stelsheet"/>
+</head>
+<body>
+    <div>
+        <p>Chandler's Favorite Books:</p>
+        <ol>
+            {% for i in range(num_books) %}
+            {% if fav_books[i].title == "SYLO" %}
+                <li class="favorite">
+            {% else %}
+                <li >
+            {% endif %}
+                    <b grid-column=1>{{fav_books[i].title}}
+                        {% if fav_books[i].subtitle is not none %}
+                        : {{fav_books[i].subtitle}}
+                        {% endif %}
+                    </b>
+                    <p grid-columns=1> {{fav_books[i].author}}</p>
+                    {% if fav_books[i].image is none %}
+                        <img grid-column=2 src="/static/images/basic_book.png" width="128" height="196">
+                    {% else %}
+                        <img grid-column=2 src={{fav_books[i].image}}/>
+                    {% endif %}
+                    <!--
+                        does the same as addBook() button by storing title in deleteBook()
+                        the title will then be sent to main.py to then be deleted by the delete function 
+                    -->
+                    <button onclick="deleteBook('{{fav_books[i].title}}')">Delete</button>
+                </li>
+        {% endfor %}
+        </ol>
+    </div>
+    <div >
+    <form method="GET" action="/">
+        <input type="text" name="query" placeholder="Search for a book!"/>
+        <input type="submit" value="Search"/>
+    </form>
+        <b>Search results: </b>
+        <ol>
+            {% for i in range(search_results|length) %}
+                <li>
+                    <b grid-column=1>{{search_results[i]["title"]}}
+                        {% if search_results[i]["subtitle"] is not none %}
+                        : {{search_results[i]["subtitle"]}}
+                        {% endif %}
+                    </b>
+                    <p grid-column=1>{{search_results[i]["author"]}}</p>
+                    {% if search_results[i]["image"] is none %}
+                        <img grid-column=2 src="/static/images/basic_book.png" width="128" height="196">
+                    {% else %}
+                        <img grid-column=2 src={{search_results[i]["image"]}}/>
+                    {% endif %}  
+                    <!--creates a button and stores the titles of the book in addBook() 
+                        no clue if this is a good way to do this, but it works. If there is a 
+                        better way (which i am assuming there is) would love to know.
+                    -->
+                    <button onclick="addBook('{{search_results[i]["title"]}}')">Add</button>
+                </li>
+            {% endfor %}
+        </ol>
+    </div>
+    <script>
+        // I understand that this is probably a bit of a janky way to do this, but it works
+        function addBook(book_title) {
+            // get the search results from jinja and puts them into js function
+            let search = JSON.parse('{{search_results | tojson}}');
+            let length = search.length;
+            let book_to_database = "";
+            //loops through search results to find title of book that the function is calling on
+            //if the title of that search result is equal to the book_title, book_to_database is set to the a dict of object of the book
+            for (let i = 0; i < length; i++) {
+                if (search[i]["title"] == book_title) {
+                    book_to_database = search[i];
+                }
+            }
+            // talks to main.py function add() and sends the book dict object as a json string
+            fetch('/add',
+                {
+                    method: 'POST',
+                    body: JSON.stringify(book_to_database)
+                }
+            ).then(response => window.location="/");
+        }
+
+        // same as the previous fetch
+        function deleteBook(book) {
+            fetch('/delete',
+                {
+                    method: 'POST',
+                    body: JSON.stringify(book)
+
+                }
+            ).then(response => window.location="/");
+        }
+    </script>
+</body>
+</html>
