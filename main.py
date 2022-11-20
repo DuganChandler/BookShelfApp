@@ -77,7 +77,7 @@ def delete():
 
 @app.route('/', methods=["POST", "GET"])
 def index():
-    query = flask.request.args.get("query")
+    '''
     # gets the initial favorite books of mine and stores them in the db
     for element in queries:
         response = get_books(element)
@@ -89,15 +89,17 @@ def index():
                 author=", ".join(response["items"][0]['volumeInfo'].get('authors', [])),
                 image=response["items"][0]['volumeInfo']["imageLinks"]['thumbnail'] 
             )
-        
+
             db.session.add(my_fav_books)
             db.session.commit()
+    ''' 
 
     fav_books = FavoriteBooks.query.all()
     num_books = len(fav_books)
     
     # gets the json response of books from books.py
     # stores the books in a list of dicts
+    query = flask.request.args.get("query")
     search_results = []
     if query is not None:
         response = get_books(query)
