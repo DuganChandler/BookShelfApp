@@ -89,7 +89,6 @@ def index():
                 author=", ".join(response["items"][0]['volumeInfo'].get('authors', [])),
                 image=response["items"][0]['volumeInfo']["imageLinks"]['thumbnail'] 
             )
-
             db.session.add(my_fav_books)
             db.session.commit()
     ''' 
